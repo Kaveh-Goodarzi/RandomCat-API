@@ -41,7 +41,9 @@ var catDescriptions= []string{
 func main() {
 	rand.Seed(time.Now().UnixNano())
 
-	http.HandleFunc("/", homeHandler)
+	fs := http.FileServer(http.Dir("../frontend"))
+	http.Handle("/", fs)
+
 	http.HandleFunc("/random-cat", randomCatHandler)
 	http.HandleFunc("/health", healthHandler)
 
@@ -51,7 +53,7 @@ func main() {
 	fmt.Println(strings.Repeat("🐱", 30))
 	fmt.Printf("Server running on http://localhost%s\n", port)
 	fmt.Println("Endpoints:")
-	fmt.Println("  GET /           → Frontend")
+	fmt.Println("  GET /           → frontend")
 	fmt.Println("  GET /random-cat → Random cat data")
 	fmt.Println("  GET /health     → Health check")
 	fmt.Println(strings.Repeat("🐱", 30))
@@ -61,9 +63,6 @@ func main() {
 	}
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "../frontend/index.html")
-}
 
 func randomCatHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
