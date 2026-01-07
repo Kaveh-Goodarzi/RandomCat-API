@@ -133,10 +133,15 @@ func generateRandomTags() []string {
 
 	// 2-4 tag for each cat
 	numTags := 2 + rand.Intn(3)
-	selected := make([]string, numTags)
+	unique := map[string]bool{}
+	var selected []string
 
-	for i := 0; i < numTags; i++ {
-		selected[i] = tags[rand.Intn(len(tags))]
+	for len(selected) < numTags {
+		tag := tags[rand.Intn(len(tags))]
+		if !unique[tag] {
+			unique[tag] = true
+			selected = append(selected, tag)
+		}
 	}
 
 	return selected
