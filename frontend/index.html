@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Random Cat 🐱</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Random Cat🐱 Generator</h1>
+        
+        <button onclick="getRandomCat()">Get Random Cat!</button>
+        
+        <div class="cat-container" id="catContainer">
+            <p>Click button to see a random cat!</p>
+        </div>
+        
+        <div class="info">
+            <small>Powered by <a href="https://cataas.com" target="_blank">CATAAS API</a></small>
+        </div>
+    </div>
+
+    <script>
+        async function getRandomCat() {
+            const container = document.getElementById('catContainer');
+            
+            // Show loading
+            container.innerHTML = '<p class="loading">Loading cat... 🐾</p>';
+            
+            try {
+                // Get random cat from backend
+                const response = await fetch('http://localhost:8080/random-cat');
+                
+                if (!response.ok) {
+                    throw new Error('Failed to fetch cat');
+                }
+                
+                const data = await response.json();
+                
+                container.innerHTML = `
+                    <div class="cat-card">
+                        <img src="${data.image_url}" 
+                             alt="Random Cat" 
+                             class="cat-image"
+                             onerror="this.src='https://http.cat/404'">
+                        <div class="cat-info">
+                            <h3>${data.breed || 'Unknown Breed'}</h3>
+                            <p>${data.description || 'A cute random cat!'}</p>
+                            <p><strong>ID:</strong> ${data.id}</p>
+                            <p><strong>Tags:</strong> ${data.tags?.join(', ') || 'none'}</p>
+                        </div>
+                        <div class="cat-actions">
+                            <button onclick="downloadCat('${data.image_url}')">
+                                📥 Download
+                            </button>
+                            <button onclick="getRandomCat()">
+                                🔄 Next Cat🐱!
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                container.innerHTML = `
+                    <div class="error">
+                        <p>😿 Could not load cat!</p>
+                        <p><small>${error.message}</small></p>
+                        <button onclick="getRandomCat()">Try Again</button>
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        }
+        
+        function downloadCat(imageUrl) {
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `cat_${Date.now()}.jpg`;
+            link.click();
+        }
+        
+        window.onload = getRandomCat;
+    </script>
+</body>
+</html>
